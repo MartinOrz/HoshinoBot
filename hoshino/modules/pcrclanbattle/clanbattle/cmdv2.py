@@ -11,7 +11,6 @@ PCR会战管理命令 v2
 
 import os
 from datetime import datetime, timedelta
-from typing import List
 from matplotlib import pyplot as plt
 try:
     import ujson as json
@@ -233,6 +232,17 @@ async def process_challenge(bot:NoneBot, ctx:Context_T, ch:ParseResult):
 
     await auto_unlock_boss(bot, ctx, bm)
     await auto_unsubscribe(bot, ctx, bm.group, mem['uid'], boss)
+
+@cb_cmd(('sl', 'SL', 'Sl', 'sL'), ArgParser(usage='!sl (@qq)', arg_dict={
+    '@': ArgHolder(tip='qq号', type=int, default=0)}))
+async def sl(bot:NoneBot, ctx:Context_T, args:ParseResult):
+    bm = BattleMaster(ctx['group_id'])
+    now = datetime.now()
+    clan = _check_clan(bm)
+    uid = args['@'] or args.at or ctx['user_id']
+    alt = ctx['group_id']
+    mem = _check_member(bm, uid, alt)
+    bm.sl(mem['uid'], alt, now)
 
 
 @cb_cmd(('出刀', '报刀'), ArgParser(usage='!出刀 <伤害值> (@qq)', arg_dict={
