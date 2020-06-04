@@ -11,6 +11,7 @@ PCR会战管理命令 v2
 
 import os
 from datetime import datetime, timedelta
+from typing import List
 from matplotlib import pyplot as plt
 try:
     import ujson as json
@@ -29,6 +30,7 @@ from .argparse import ArgParser, ArgHolder, ParseResult
 from .argparse.argtype import *
 from .battlemaster import BattleMaster
 from .exception import *
+import config
 
 plt.style.use('seaborn-pastel')
 plt.rcParams['font.family'] = ['DejaVuSans', 'Microsoft YaHei', 'SimSun', ]
@@ -233,7 +235,7 @@ async def process_challenge(bot:NoneBot, ctx:Context_T, ch:ParseResult):
     await auto_unlock_boss(bot, ctx, bm)
     await auto_unsubscribe(bot, ctx, bm.group, mem['uid'], boss)
 
-@cb_cmd(('sl', 'SL', 'Sl', 'sL'), ArgParser(usage='!sl (@qq)', arg_dict={
+@cb_cmd('sl', ArgParser(usage='!sl (@qq)', arg_dict={
     '@': ArgHolder(tip='qq号', type=int, default=0)}))
 async def sl(bot:NoneBot, ctx:Context_T, args:ParseResult):
     bm = BattleMaster(ctx['group_id'])
@@ -242,8 +244,25 @@ async def sl(bot:NoneBot, ctx:Context_T, args:ParseResult):
     uid = args['@'] or args.at or ctx['user_id']
     alt = ctx['group_id']
     mem = _check_member(bm, uid, alt)
-    bm.sl(mem['uid'], alt, now)
+    if bm.sl(mem['uid'], alt, now):
+        await bot.send(ctx, f"{clan['name']}已记录{ms.at(uid)}的SL！", at_sender=True)
+    else:
+        await bot.send(ctx, f"{ms.at(uid)}已经SL过了，还想来？？", at_sender=True)
 
+@cb_cmd('删sl', ArgParser(usage='!删sl (@qq)', arg_dict={
+    '@': ArgHolder(tip='qq号', type=int, default=0)}))
+async def sl(bot:NoneBot, ctx:Context_T, args:ParseResult):
+    bm = BattleMaster(ctx['group_id'])
+    now = datetime.now()
+    clan = _check_clan(bm)
+    uid = args['@'] or args.at or ctx['user_id']
+    alt = ctx['group_id']
+    mem = _check_member(bm, uid, alt)
+    if uid not in config.SUPERUSERS:
+        await bot.send(ctx, f"我只听主人的话呢！宁还不配使用这个命令！", at_sender=True)
+    else:
+        bm.del_sl(mem['uid'], alt, now)
+        await bot.send(ctx, f"{clan['name']}已删除{ms.at(uid)}的SL！", at_sender=True)
 
 @cb_cmd(('出刀', '报刀'), ArgParser(usage='!出刀 <伤害值> (@qq)', arg_dict={
     '': ArgHolder(tip='伤害值', type=damage_int),

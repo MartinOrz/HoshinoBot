@@ -214,8 +214,8 @@ async def gacha_300(session:CommandSession):
     msg.append(SWITCH_POOL_TIP)
 
     await session.send('\n'.join(msg), at_sender=True)
-    silence_time = (100*up + 50*(up+s3) + 10*s2 + s1) * 1
-    await silence(session.ctx, silence_time)
+    # silence_time = (10*up + 5*(up+s3) + 2*s2 + s1) * 1
+    # await silence(session.ctx, silence_time)
 
 
 @sv.on_rex(r'^氪金$', normalize=False)

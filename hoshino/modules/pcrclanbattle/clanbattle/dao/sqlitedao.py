@@ -244,7 +244,7 @@ class BattleSLDao(SqliteDao):
         return {
             'sid': r[0],
             'uid': r[1],
-            'date': r[2]
+            'time': r[2]
         } if r else None
 
     def add(self, uid, yyyy, mm, dd):
@@ -262,9 +262,19 @@ class BattleSLDao(SqliteDao):
         datetime = yyyy * 10000 + mm * 100 + dd
         with self._connect() as conn:
             try:
-                ret = conn.execute('''SELECT {1} FROM {0} WHERE uid=? AND date=?'''.format(self._table, self._columns),
+                ret = conn.execute('''SELECT {1} FROM {0} WHERE uid=? AND time=?'''.format(self._table, self._columns),
                                    (uid, datetime)).fetchone()
                 return self.row2item(ret)
+            except sqlite3.DatabaseError as e:
+                logger.error(f'[BattleSLDao.find] {e}')
+                raise DatabaseError('查找记录失败')
+
+    def delete(self, uid, yyyy, mm, dd):
+        datetime = yyyy * 10000 + mm * 100 + dd
+        with self._connect() as conn:
+            try:
+                ret = conn.execute('''DELETE FROM {0} WHERE uid=? AND time=?'''.format(self._table, self._columns),
+                                   (uid, datetime)).fetchone()
             except sqlite3.DatabaseError as e:
                 logger.error(f'[BattleSLDao.find] {e}')
                 raise DatabaseError('查找记录失败')

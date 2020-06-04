@@ -175,6 +175,17 @@ class BattleMaster(object):
             dao.add(uid, yyyy, mm, dd)
             return True
 
+    def del_sl(self, uid, alt, time):
+        mem = self.get_member(uid, alt)
+        if not mem or mem['gid'] != self.group:
+            raise NotFoundError('未找到成员')
+        cid = mem['cid']
+        clan = self.get_clan(cid)
+        zone_num = self.get_timezone_num(clan['server'])
+        yyyy, mm, dd = self.get_yyyymmdd(time, zone_num)
+        dao = BattleSLDao(self.group, cid, yyyy, mm)
+        dao.delete(uid, yyyy, mm, dd)
+
     def add_challenge(self, uid, alt, round_, boss, dmg, flag, time):
         mem = self.get_member(uid, alt)
         if not mem or mem['gid'] != self.group:
