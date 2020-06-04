@@ -49,7 +49,7 @@ def jio_gener():
 
 def naizi_gener():
     setus = []
-    path = os.path.join(setu_folder, PANTSU)
+    path = os.path.join(setu_folder, NAIZI)
     for root, dirs, files in os.walk(path):
         for file in files:
             setus.append(os.path.join(root, file))
@@ -62,7 +62,7 @@ def naizi_gener():
 
 def pantsu_gener():
     setus = []
-    path = os.path.join(setu_folder, JIO)
+    path = os.path.join(setu_folder, PANTSU)
     for root, dirs, files in os.walk(path):
         for file in files:
             setus.append(os.path.join(root, file))
