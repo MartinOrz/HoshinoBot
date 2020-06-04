@@ -22,9 +22,47 @@ NAIZI = 'naizi'
 PANTSU = 'pantsu'
 
 
-def setu_gener(sub:str=None):
+def setu_gener():
     setus = []
-    path = os.path.join(setu_folder, sub) if sub is not None else setu_folder
+    for root, dirs, files in os.walk(setu_folder):
+        for file in files:
+            setus.append(os.path.join(root, file))
+    now = 0
+    if now == 0:
+        random.shuffle(setus)
+    now = (now + 1) % len(setus)
+    yield R.img(setus[now])
+
+
+def jio_gener():
+    setus = []
+    path = os.path.join(setu_folder, JIO)
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            setus.append(os.path.join(root, file))
+    now = 0
+    if now == 0:
+        random.shuffle(setus)
+    now = (now + 1) % len(setus)
+    yield R.img(setus[now])
+
+
+def naizi_gener():
+    setus = []
+    path = os.path.join(setu_folder, PANTSU)
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            setus.append(os.path.join(root, file))
+    now = 0
+    if now == 0:
+        random.shuffle(setus)
+    now = (now + 1) % len(setus)
+    yield R.img(setus[now])
+
+
+def pantsu_gener():
+    setus = []
+    path = os.path.join(setu_folder, JIO)
     for root, dirs, files in os.walk(path):
         for file in files:
             setus.append(os.path.join(root, file))
@@ -36,13 +74,9 @@ def setu_gener(sub:str=None):
 
 
 setu_gener = setu_gener()
-jio_gener = setu_gener(JIO)
-naizi_gener = setu_gener(NAIZI)
-pantus_gener = setu_gener(PANTSU)
-
-
-def get_setu():
-    return setu_gener.__next__()
+jio_gener = jio_gener()
+naizi_gener = naizi_gener()
+pantsu_gener = pantsu_gener()
 
 
 @sv.on_rex(re.compile(r'不够[涩瑟色]|[涩瑟色]图|来一?[点份张].*[涩瑟色]|再来[点份张]|看过了|铜'), normalize=True)
@@ -62,7 +96,7 @@ async def normal(bot:NoneBot, ctx):
 
 @sv.on_rex(re.compile(r'胖次|我要胖次'), normalize=True)
 async def normal(bot:NoneBot, ctx):
-    setu(bot, ctx, pantus_gener)
+    setu(bot, ctx, pantsu_gener)
 
 
 async def setu(bot:NoneBot, ctx, gener):
@@ -78,7 +112,7 @@ async def setu(bot:NoneBot, ctx, gener):
     _nlmt.increase(uid)
 
     # conditions all ok, send a setu.
-    pic = gener()
+    pic = gener.__next__()
     try:
         await bot.send(ctx, pic.cqcode)
     except CQHttpError:
