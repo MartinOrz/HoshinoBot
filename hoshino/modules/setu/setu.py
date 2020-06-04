@@ -81,22 +81,22 @@ pantsu_gener = pantsu_gener()
 
 @sv.on_rex(re.compile(r'不够[涩瑟色]|[涩瑟色]图|来一?[点份张].*[涩瑟色]|再来[点份张]|看过了|铜'), normalize=True)
 async def normal(bot:NoneBot, ctx, match):
-    setu(bot, ctx, setu_gener)
+    await setu(bot, ctx, setu_gener)
 
 
 @sv.on_rex(re.compile(r'舔脚|我要舔脚|舔jio|jio|脚'), normalize=True)
 async def normal(bot:NoneBot, ctx, match):
-    setu(bot, ctx, jio_gener)
+    await setu(bot, ctx, jio_gener)
 
 
 @sv.on_rex(re.compile(r'奶子|我要奶子'), normalize=True)
 async def normal(bot:NoneBot, ctx, match):
-    setu(bot, ctx, naizi_gener)
+    await setu(bot, ctx, naizi_gener)
 
 
 @sv.on_rex(re.compile(r'胖次|我要胖次'), normalize=True)
 async def normal(bot:NoneBot, ctx, match):
-    setu(bot, ctx, pantsu_gener)
+    await setu(bot, ctx, pantsu_gener)
 
 
 async def setu(bot:NoneBot, ctx, gener):
