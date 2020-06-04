@@ -67,10 +67,11 @@ def pantsu_gener():
         for file in files:
             setus.append(os.path.join(root, file))
     now = 0
-    if now == 0:
-        random.shuffle(setus)
-    now = (now + 1) % len(setus)
-    yield R.img(setus[now])
+    while True:
+        if now == 0:
+            random.shuffle(setus)
+        now = (now + 1) % len(setus)
+        yield R.img(setus[now])
 
 
 setu_gener = setu_gener()
