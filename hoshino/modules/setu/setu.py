@@ -1,6 +1,5 @@
 import os
 import re
-import time
 import random
 
 from nonebot import on_command, CommandSession, MessageSegment, NoneBot
@@ -9,7 +8,7 @@ from nonebot.exceptions import CQHttpError
 from hoshino import R, Service, Privilege
 from hoshino.util import FreqLimiter, DailyNumberLimiter
 
-_max = 5
+_max = 10
 EXCEED_NOTICE = f'您今天已经冲过{_max}次了，请明早5点后再来！'
 _nlmt = DailyNumberLimiter(_max)
 _flmt = FreqLimiter(5)
@@ -17,22 +16,56 @@ _flmt = FreqLimiter(5)
 sv = Service('setu', manage_priv=Privilege.SUPERUSER, enable_on_default=True, visible=False)
 setu_folder = R.img('setu/').path
 
-def setu_gener():
-    while True:
-        filelist = os.listdir(setu_folder)
-        random.shuffle(filelist)
-        for filename in filelist:
-            if os.path.isfile(os.path.join(setu_folder, filename)):
-                yield R.img('setu/', filename)
+
+JIO = 'jio'
+NAIZI = 'naizi'
+PANTSU = 'pantsu'
+
+
+def setu_gener(sub:str=None):
+    setus = []
+    path = os.path.join(setu_folder, sub) if sub is not None else setu_folder
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            setus.append(os.path.join(root, file))
+    now = 0
+    if now == 0:
+        random.shuffle(setus)
+    now = (now + 1) % len(setus)
+    yield R.img(setus[now])
+
 
 setu_gener = setu_gener()
+jio_gener = setu_gener(JIO)
+naizi_gener = setu_gener(NAIZI)
+pantus_gener = setu_gener(PANTSU)
+
 
 def get_setu():
     return setu_gener.__next__()
 
 
 @sv.on_rex(re.compile(r'不够[涩瑟色]|[涩瑟色]图|来一?[点份张].*[涩瑟色]|再来[点份张]|看过了|铜'), normalize=True)
-async def setu(bot:NoneBot, ctx, match):
+async def normal(bot:NoneBot, ctx):
+    setu(bot, ctx, setu_gener)
+
+
+@sv.on_rex(re.compile(r'舔脚|我要舔脚|舔jio|jio|脚'), normalize=True)
+async def normal(bot:NoneBot, ctx):
+    setu(bot, ctx, jio_gener)
+
+
+@sv.on_rex(re.compile(r'奶子|我要奶子'), normalize=True)
+async def normal(bot:NoneBot, ctx):
+    setu(bot, ctx, naizi_gener)
+
+
+@sv.on_rex(re.compile(r'胖次|我要胖次'), normalize=True)
+async def normal(bot:NoneBot, ctx):
+    setu(bot, ctx, pantus_gener)
+
+
+async def setu(bot:NoneBot, ctx, gener):
     """随机叫一份涩图，对每个用户有冷却时间"""
     uid = ctx['user_id']
     if not _nlmt.check(uid):
@@ -45,7 +78,7 @@ async def setu(bot:NoneBot, ctx, match):
     _nlmt.increase(uid)
 
     # conditions all ok, send a setu.
-    pic = get_setu()
+    pic = gener()
     try:
         await bot.send(ctx, pic.cqcode)
     except CQHttpError:

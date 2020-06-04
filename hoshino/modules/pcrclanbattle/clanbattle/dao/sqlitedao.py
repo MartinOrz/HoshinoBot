@@ -221,6 +221,25 @@ class MemberDao(SqliteDao):
                 logger.error(f'[MemberDao.find_by] {e}')
                 raise DatabaseError('查找成员失败')
 
+class BattleMergeDao(SqliteDao):
+
+    def __init__(self, gid, cid, yyyy, mm):
+        super().__init__(
+            table=self.get_table_name(gid, cid, yyyy, mm),
+            columns='mid, uid, alt, time, round, boss',
+            fields='''
+            mid INTEGER PRIMARY KEY AUTOINCREMENT,
+            uid INT NOT NULL,
+            alt INT NOT NULL,
+            time TIMESTAMP NOT NULL,
+            round INT NOT NULL,
+            boss  INT NOT NULL
+            '''
+        )
+
+    @staticmethod
+    def get_table_name(gid, cid, yyyy, mm):
+        return 'battle_merge_%d_%d_%04d%02d' % (gid, cid, yyyy, mm)
 
 class BattleSLDao(SqliteDao):
 
